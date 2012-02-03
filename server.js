@@ -42,5 +42,5 @@ mongo_db.open(function(err, db) {
     app.listen(port, function() {
       console.log("Listening on port " + port);
     });
- });
+  });
 });

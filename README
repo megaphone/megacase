@@ -1,0 +1,42 @@
+This is a test case app to explore a potential bug in the node-mongodb-native driver where using authentication causes collection.find with a limit to leak cursors
+
+Steps to reproduce:
+Export the following variables, changed to fit your environment:
+
+export MONGO_HOST=localhost
+export MONGO_PORT=27017
+export MONGO_NAME=mongodbname
+export MONGO_USER=mongouser
+export MONGO_PASS=mongopass
+export PORT=8001
+
+Edit mongodb's config to have auth=true and ensure that there is a user for the database specified by your environment variables
+
+Add a collection called "tweets" to the database with more than 2 documents. The data in the documents doesn't matter they just need an _id field.
+
+Run the app with "node server.js"
+
+Visit the url http://localhost:8001, you should see the _id's on the page
+
+In a mongodb shell call db.serverStatus()['cursors'] and check the totalOpen count. It should rise every time you reload the page.
+
+Next, comment out the "db.authenticate" line in server.js and the closing line (41 and 45) and turn off auth in mongodb config and restart mongo and your server.js app. Now when you hit the same url the totalOpen count will not rise every time you reload the page.
+
+
+
+With auth the mongo log looks like this with verbose=true:
+Fri Feb  3 21:09:20 [conn6] query mongodbname.tweets ntoreturn:2 nreturned:2 reslen:64 0ms
+Fri Feb  3 21:09:20 [conn6] killcursors  0ms
+
+
+node 0.4.7
+npm 1.0.106
+mongodb 2.0.2
+npm ls
+  megacase@0.1.0 /var/www/megacase
+  ├─┬ express@2.4.6 
+  │ ├─┬ connect@1.8.5 
+  │ │ └── formidable@1.0.8 
+  │ ├── mime@1.2.4 
+  │ └── qs@0.4.1 
+  └── mongodb@0.9.8-5
