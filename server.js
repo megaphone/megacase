@@ -5,12 +5,14 @@ var express       = require('express'),
 var app = express.createServer();
 
 app.get("/", function(req, res) {
-  global.mongo_db.collection("tweets", function(err, col) {
+  global.mongo_db.collection("tweets", function(err, collection) {
+    // if limit == 1 this does not leak cursors
+    // if limit > total objects this does not leak cursors
     var options = { limit: 2 };
     var conditions = {};
-    var field_obj = { _id: true };
+    var fields = { _id: true };
     
-    col.find(conditions, field_obj, options).toArray(function(err, tweets) {
+    collection.find(conditions, fields, options).toArray(function(err, tweets) {
       res.send(util.inspect(tweets));
     });
   });
@@ -18,6 +20,7 @@ app.get("/", function(req, res) {
 
 var port = process.env.PORT || 3000;
 
+// Environment variables which specify the connection
 var mongo_config = {
   host: process.env.MONGO_HOST,
   port: parseInt(process.env.MONGO_PORT),
@@ -34,10 +37,8 @@ mongo_server = new Mongo.Server(mongo_config.host, mongo_config.port, {
 });
 global.mongo_db = new Mongo.Db(mongo_config.db, mongo_server, {});
 mongo_db.open(function(err, db) {
-  if (err) console.log("ERROR OPENING DB!}", err);
+  // If you remove db.authenticate then the collection.find does not leak
   db.authenticate(mongo_config.username, mongo_config.password, function(err, success) {
-    if (err) console.log("ERROR AUTHENTICATING DB!}", err);
-    console.log("DB Authenticate: " + success);
     app.listen(port, function() {
       console.log("Listening on port " + port);
     });
