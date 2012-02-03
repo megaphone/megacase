@@ -30,11 +30,7 @@ var mongo_config = {
   auto_reconnect: true
 }
 
-mongo_server = new Mongo.Server(mongo_config.host, mongo_config.port, {
-  auto_reconnect: true,
-  safe: true,
-  native_parser: true
-});
+mongo_server = new Mongo.Server(mongo_config.host, mongo_config.port, {});
 global.mongo_db = new Mongo.Db(mongo_config.db, mongo_server, {});
 mongo_db.open(function(err, db) {
   // If you remove db.authenticate then the collection.find does not leak
