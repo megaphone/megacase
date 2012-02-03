@@ -6,19 +6,11 @@ var app = express.createServer();
 
 app.get("/", function(req, res) {
   global.mongo_db.collection("tweets", function(err, col) {
-    var sort_limit_skip_options = { limit: 2, sort: [ [ 'created_at', 'desc' ] ] };
+    var options = { limit: 2 };
     var conditions = {};
-    var field_obj = { 
-      'user.profile_image_url': true,
-      'user.screen_name': true,
-      text: true,
-      created_at: true,
-      id: true,
-      megachatter: true 
-    };
+    var field_obj = { _id: true };
     
-    cursor = col.find(conditions, field_obj);
-    cursor.limit(20).toArray(function(err, tweets) {
+    col.find(conditions, field_obj, options).toArray(function(err, tweets) {
       res.send(util.inspect(tweets));
     });
   });
@@ -49,5 +41,5 @@ mongo_db.open(function(err, db) {
     app.listen(port, function() {
       console.log("Listening on port " + port);
     });
-  });
+ });
 });
