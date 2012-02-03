@@ -12,7 +12,10 @@ export PORT=8001
 
 Edit mongodb's config to have auth=true and ensure that there is a user for the database specified by your environment variables
 
-Add a collection called "tweets" to the database with more than 2 documents. The data in the documents doesn't matter they just need an _id field.
+Add a collection called "tweets" to the database with more than 2 documents. The data in the documents doesn't matter they just need an _id field. To populate the collection with three documents (the minimum you need to test) you can do the following from the mongo shell:
+db.tweets.insert({})
+db.tweets.insert({})
+db.tweets.insert({})
 
 Run the app with "node server.js"
 
@@ -27,6 +30,8 @@ Next, comment out the "db.authenticate" line in server.js and the closing line (
 With auth the mongo log looks like this with verbose=true:
 Fri Feb  3 21:09:20 [conn6] query mongodbname.tweets ntoreturn:2 nreturned:2 reslen:64 0ms
 Fri Feb  3 21:09:20 [conn6] killcursors  0ms
+
+If the collection.find limit is 1 or >= the number of 'tweets' in the database then we do not see a killcursors command in the logs and the totalOpen cursors count does not increase with each page load.
 
 
 node 0.4.7
