@@ -1,0 +1,8 @@
+{
+  "name":"megacase",
+  "version":"0.1.0",
+  "dependencies":{
+    "express":"2.4.6",
+    "mongodb":"~> 0.9.4"
+  }
+}
